@@ -8,17 +8,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
+
+import static frc.robot.subsystems.Drivetrain.kMaxAngularSpeed;
+import static frc.robot.subsystems.Drivetrain.kMaxSpeed;
 
 /**
  * An example command.  You can replace me with your own command.
  */
-public class SetArcadeDrive extends CommandBase {
+public class SetArcadeDriveSpeed extends CommandBase {
     private final Drivetrain m_drivetrain;
 
-    public SetArcadeDrive(Drivetrain drivetrain) {
+    public SetArcadeDriveSpeed(Drivetrain drivetrain) {
         // Use requires() here to declare subsystem dependencies
         this.m_drivetrain = drivetrain;
         addRequirements(m_drivetrain);
@@ -32,10 +34,10 @@ public class SetArcadeDrive extends CommandBase {
     // Called repeatedly when this Command is scheduled to run
     @Override
     public void execute() {
-        double throttle = RobotContainer.leftJoystick.getY();
-        double turn = RobotContainer.leftJoystick.getX();
+        double throttle = RobotContainer.leftJoystick.getY() * kMaxSpeed;
+        double turn = RobotContainer.leftJoystick.getX() * kMaxAngularSpeed;
 
-        m_drivetrain.setMotorArcadeDrive(throttle, turn);
+        m_drivetrain.drive(throttle, turn);
     }
 
     // Make this return true when this Command no longer needs to run execute()

@@ -8,12 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.SetArcadeDrive;
-import frc.robot.subsystems.Drivetrain;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,11 +19,10 @@ import frc.robot.subsystems.Drivetrain;
  * project.
  */
 public class Robot extends TimedRobot {
-  public static Drivetrain drivetrain = new Drivetrain();
-  public static OI m_oi;
+    private Command m_autonomousCommand;
+    private Command m_driveCommand;
 
-  Command m_autonomousCommand;
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  private RobotContainer m_robotContainer;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -35,10 +30,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_oi = new OI();
-    m_chooser.setDefaultOption("Default Auto", new SetArcadeDrive());
-    // chooser.addOption("My Auto", new MyAutoCommand());
-    SmartDashboard.putData("Auto mode", m_chooser);
+    m_robotContainer = new RobotContainer();
   }
 
   /**
@@ -51,6 +43,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
   }
 
   /**
@@ -64,7 +57,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    Scheduler.getInstance().run();
   }
 
   /**
@@ -80,7 +72,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autonomousCommand = m_chooser.getSelected();
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     /*
      * String autoSelected = SmartDashboard.getString("Auto Selector",
@@ -91,7 +83,7 @@ public class Robot extends TimedRobot {
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.start();
+      m_autonomousCommand.schedule();
     }
   }
 
@@ -100,7 +92,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
-    Scheduler.getInstance().run();
   }
 
   @Override
@@ -112,6 +103,22 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+
+      m_driveCommand = m_robotContainer.m_driveChooser.getSelected();
+
+      /*
+       * String autoSelected = SmartDashboard.getString("Auto Selector",
+       * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
+       * = new MyAutoCommand(); break; case "Default Auto": default:
+       * autonomousCommand = new ExampleCommand(); break; }
+       */
+
+      // schedule the autonomous command (example)
+      if (m_driveCommand != null) {
+          m_driveCommand.schedule();
+          m_robotContainer.getDriveTrain().setDefaultCommand(m_driveCommand);
+      }
   }
 
   /**
@@ -119,7 +126,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    Scheduler.getInstance().run();
   }
 
   /**
