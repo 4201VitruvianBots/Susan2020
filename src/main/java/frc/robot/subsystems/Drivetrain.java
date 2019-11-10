@@ -20,7 +20,11 @@ import edu.wpi.first.wpilibj2.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj2.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj2.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.commands.SetArcadeDrive;
+import frc.robot.commands.SetArcadeDriveSpeed;
+import frc.vitruvianlib.driverstation.Shuffleboard;
 
 /**
  * An example subsystem.  You can replace me with your own Subsystem.
@@ -156,15 +160,26 @@ public class Drivetrain extends SubsystemBase {
         double rightOutput = m_rightPIDController.calculate(getSensorRate(2),
                 speeds.rightMetersPerSecond);
 
-        setMotorOutputs(leftOutput, rightOutput);
+        SmartDashboard.putNumber("Left Output Speed", leftOutput);
+        SmartDashboard.putNumber("Right Output Speed", rightOutput);
+
+        if(this.getDefaultCommand().getClass() == SetArcadeDriveSpeed.class)
+           setMotorOutputs(leftOutput, rightOutput);
     }
 
     public void updateOdometry() {
         m_odometry.update(getAngle(), getCurrentSpeeds());
     }
 
+    public void updateShuffleboard() {
+        SmartDashboard.putNumber("Left Rate", getSensorRate(0));
+        SmartDashboard.putNumber("Right Rate", getSensorRate(2));
+        SmartDashboard.putNumber("Angle", getNavXAngle());
+    }
+
     @Override
     public void periodic() {
         updateOdometry();
+        updateShuffleboard();
     }
 }
